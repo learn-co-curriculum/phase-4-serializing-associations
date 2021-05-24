@@ -1,5 +1,5 @@
   
-movie1 = Movie.create(
+movie1 = Movie.new(
     {
       title: "The Color Purple",
       year: 1985,
@@ -19,8 +19,10 @@ movie1.create_director(
   }
 )
 
+movie1.save
 
-movie2 = Movie.create(
+
+movie2 = Movie.new(
       {
       title: "Frida",
       year: 2002,
@@ -40,8 +42,10 @@ movie2.create_director(
   }
 )
 
+movie2.save
 
-movie3 = Movie.create(
+
+movie3 = Movie.new(
       {
       title: "Queen of Katwe",
       year: 2016,
@@ -60,3 +64,5 @@ movie3.create_director(
     sex: "female"
   }
 )
+
+movie3.save

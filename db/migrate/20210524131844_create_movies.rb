@@ -8,6 +8,7 @@ class CreateMovies < ActiveRecord::Migration[6.1]
       t.string :poster_url
       t.string :category
       t.boolean :discount
+      t.integer :director_id
 
       t.timestamps
     end
