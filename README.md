@@ -17,7 +17,7 @@ To enable us to do this, we've expanded our movie app to include two more
 models. Specifically, we made the following changes:
 
 - Instead of including `director` as an attribute of our `Movie` instances,
-   we created a separate `Director` class.
+  we created a separate `Director` class.
 - We modified our app to include movie reviews using a `Review` class.
 
 The relationships we want to model look like this:
@@ -31,9 +31,9 @@ To implement the `Director` class, we made the following changes to our code:
 1. Removed `director` and `female_director` as attributes in our movie migration
    file; added a `director_id` attribute
 2. Added a new migration for our `director` model with three attributes: `name`,
-   `birthplace` and `sex`
-3. Added the `belongs_to :director` macro to the `Movie` model and the `has_many
-   :movies` macro to the `Director` model
+   `birthplace` and `female_director`
+3. Added the `belongs_to :director` macro to the `Movie` model and the
+   `has_many :movies` macro to the `Director` model
 4. Added `index` and `show` routes for the `Director` model in `config/routes.rb`
 5. Added a `DirectorsController` and created the `index` and `show` actions
 
@@ -41,8 +41,8 @@ To implement the `Review` class, we made the following changes:
 
 1. Added a new migration with four attributes: `author`, `date`, `url`, and
    `movie_id`
-2. Added the `has_many :reviews` macro to the `Movie` model and the `belongs_to
-   :movie` macro to the `Review` model
+2. Added the `has_many :reviews` macro to the `Movie` model and the
+   `belongs_to :movie` macro to the `Review` model
 3. Added an `index` route for the `Review` model in `config/routes.rb`
 4. Created a `ReviewsController` and added the `index` action
 
@@ -68,16 +68,16 @@ You'll see that the JSON for the directors includes two attributes that we don't
 want: `created_at` and `updated_at`. Luckily we know how to fix this — we simply
 need to create a serializer for `director` as we did for `movies`:
 
-```rb
+```sh
 rails g serializer director
 ```
 
-and add the desired attributes to the `directors_serializer` file:
+We can then add the desired attributes to the `directors_serializer` file:
 
 ```rb
 # app/serializers/director_serializer.rb
 class DirectorSerializer < ActiveModel::Serializer
-  attributes :id, :name, :birthplace, :sex
+  attributes :id, :name, :birthplace, :female_director
 end
 ```
 
@@ -88,7 +88,7 @@ Next, let's take a look at our new `Movie` index route. Now that we've removed
 the `director` and `female_director` attributes, the JSON for `movies` no longer
 includes any information about director. We need to figure out how to add the
 information about each movie's associated director to the JSON being returned by
-the  `movies` serializer. AMS allows us to do this using the same macros in the
+the `movies` serializer. AMS allows us to do this using the same macros in the
 serializers that we use to set up associations in our model files. In this case,
 we want our serializer to reflect the fact that `Movie` belongs to `Director`,
 so we'll update the serializer as follows:
@@ -97,28 +97,28 @@ so we'll update the serializer as follows:
 # serializers/movie_serializer.rb
 class MovieSerializer < ActiveModel::Serializer
   attributes :id, :title, :year, :length, :description, :poster_url, :category, :discount
-  
+
   belongs_to :director
 end
 ```
 
 Now if you navigate to `localhost:3000/movies/1`, you should see the following:
 
-```txt
+```json
 {
-  id: 1,
-  title: "The Color Purple",
-  year: 1985,
-  length: 154,
-  description: "Whoopi Goldberg brings Alice Walker's Pulitzer Prize-winning feminist novel to life as Celie, a Southern woman who suffered abuse over decades. A project brought to a hesitant Steven Spielberg by producer Quincy Jones, the film marks Spielberg's first female lead.",
-  poster_url: "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/3071/3071213_so.jpg",
-  category: "Drama",
-  discount: false,
-  director: {
-    id: 1,
-    name: "Steven Spielberg",
-    birthplace: "Cincinnati, OH",
-    sex: "male"
+  "id": 1,
+  "title": "The Color Purple",
+  "year": 1985,
+  "length": 154,
+  "description": "Whoopi Goldberg brings Alice Walker's Pulitzer Prize-winning feminist novel to life as Celie, a Southern woman who suffered abuse over decades. A project brought to a hesitant Steven Spielberg by producer Quincy Jones, the film marks Spielberg's first female lead.",
+  "poster_url": "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/3071/3071213_so.jpg",
+  "category": "Drama",
+  "discount": false,
+  "director": {
+    "id": 1,
+    "name": "Steven Spielberg",
+    "birthplace": "Cincinnati, OH",
+    "female_director": false
   }
 }
 ```
@@ -131,7 +131,7 @@ corresponding macro in our `DirectorSerializer`:
 ```rb
 # serializers/director_serializer.rb
 class DirectorSerializer < ActiveModel::Serializer
-  attributes :id, :name, :birthplace, :sex
+  attributes :id, :name, :birthplace, :female_director
 
   has_many :movies
 end
@@ -139,24 +139,24 @@ end
 
 Because we have included the `has_many` macro in the `Director` serializer, when
 we navigate to `localhost:3000/directors/:id`, we can see the list of movies that
-belong to that particular director, eg:
+belong to that particular director:
 
-```text
+```json
 {
-  id: 1,
-  name: "Steven Spielberg",
-  birthplace: "Cincinnati, OH",
-  sex: "male",
-  movies: [
+  "id": 1,
+  "name": "Steven Spielberg",
+  "birthplace": "Cincinnati, OH",
+  "female_director": false,
+  "movies": [
     {
-      id: 1,
-      title: "The Color Purple",
-      year: 1985,
-      length: 154,
-      description: "Whoopi Goldberg brings Alice Walker's Pulitzer Prize-winning feminist novel to life as Celie, a Southern woman who suffered abuse over decades. A project brought to a hesitant Steven Spielberg by producer Quincy Jones, the film marks Spielberg's first female lead.",
-      poster_url: "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/3071/3071213_so.jpg",
-      category: "Drama",
-      discount: false
+      "id": 1,
+      "title": "The Color Purple",
+      "year": 1985,
+      "length": 154,
+      "description": "Whoopi Goldberg brings Alice Walker's Pulitzer Prize-winning feminist novel to life as Celie, a Southern woman who suffered abuse over decades. A project brought to a hesitant Steven Spielberg by producer Quincy Jones, the film marks Spielberg's first female lead.",
+      "poster_url": "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/3071/3071213_so.jpg",
+      "category": "Drama",
+      "discount": false
     }
   ]
 }
@@ -164,7 +164,10 @@ belong to that particular director, eg:
 
 **IMPORTANT**: You should only add macros to your serializers if you're sure you
 need the data! The level of complexity ramps up quickly as you add more macros,
-so keeping them to a minumum will save you headaches in the long run.
+so keeping them to a minimum will save you headaches in the long run. It's also
+good to consider how much data is being sent with each request, since adding more
+data means running more SQL code to access that info from different tables in the
+database, which will make our responses slower.
 
 Rails automatically uses the appropriate serializer, based on naming
 conventions, to display the associated data for each of our models. We can see
@@ -179,7 +182,9 @@ every movie in this view.
 
 To fix this, we can simply create a new, streamlined serializer:
 
-`rails g serializer director_movies`
+```sh
+rails g serializer director_movies
+```
 
 Here we'll include just the title and year of each of the director's movies:
 
@@ -189,15 +194,16 @@ class DirectorMoviesSerializer < ActiveModel::Serializer
 end
 ```
 
-Now, if you refresh the page... nothing changes. Why not? Recall that Rails
-automatically selects the serializer based on naming conventions, so it's still
-using the `DirectorSerializer` to render the data. To fix this, we need to tell
-the `DirectorSerializer` that it should be using this new serializer instead; we
-need to pass it *explicitly*:
+Now, if you refresh the page... nothing changes. Why not?
+
+Recall that Rails automatically selects the serializer based on naming
+conventions, so it's still using the `DirectorSerializer` to render the data. To
+fix this, we need to tell the `DirectorSerializer` that it should be using this
+new serializer instead; we need to pass it _explicitly_:
 
 ```rb
 class DirectorSerializer < ActiveModel::Serializer
-  attributes :id, :name, :birthplace, :sex
+  attributes :id, :name, :birthplace, :female_director
 
   has_many :movies, serializer: DirectorMoviesSerializer
 end
@@ -209,16 +215,16 @@ serializer.
 
 Now if you refresh the page, you should see the following:
 
-```txt
+```json
 {
-  id: 1,
-  name: "Steven Spielberg",
-  birthplace: "Cincinnati, OH",
-  sex: "male",
-  movies: [
+  "id": 1,
+  "name": "Steven Spielberg",
+  "birthplace": "Cincinnati, OH",
+  "female_director": false,
+  "movies": [
     {
-      title: "The Color Purple",
-      year: 1985
+      "title": "The Color Purple",
+      "year": 1985
     }
   ]
 }
@@ -251,9 +257,11 @@ end
 
 Next, we'll create our `review` serializer:
 
-`rails g serializer review`
+```sh
+rails g serializer review
+```
 
-and specify the attributes we want to include:
+We can also specify the attributes we want to include:
 
 ```rb
 # app/serializers/review_serializer.rb
@@ -264,11 +272,12 @@ end
 
 We can now go to `localhost:3000/reviews` and see our reviews listed. However,
 viewing a list of reviews separately from the information about the movies
-they're associated with is not particularly helpful. What we really want to do
-is render the information about a movie's reviews along with the rest of the
-information about that movie. In fact, we don't really need to render
-information about reviews at all *except* as part of the data rendered for a
-particular movie!
+they're associated with is not particularly helpful.
+
+What we really want to do is render the information about a movie's reviews
+along with the rest of the information about that movie. In fact, we don't
+really need to render information about reviews at all _except_ as part of the
+data rendered for a particular movie!
 
 Before we figure out how to get that in place, let's follow good programming
 practice and delete the code we no longer need: we'll remove the resource for
@@ -281,7 +290,7 @@ given movie, we'll simply add the appropriate macro to the `MovieSerializer`:
 ```rb
 class MovieSerializer < ActiveModel::Serializer
   attributes :id, :title, :year, :length, :description, :poster_url, :category, :discount
-  
+
   belongs_to :director
   has_many :reviews
 end
@@ -296,25 +305,26 @@ the JSON for movies includes their reviews. Given that, if we visit
 Unfortunately, no, we won't. Our `Director` JSON will look just the same as it
 did before we added the `Review` model:
 
-```txt
+```json
 {
-  id: 1,
-  name: "Steven Spielberg",
-  birthplace: "Cincinnati, OH",
-  sex: "male",
-  movies: [
+  "id": 1,
+  "name": "Steven Spielberg",
+  "birthplace": "Cincinnati, OH",
+  "female_director": false,
+  "movies": [
     {
-      title: "The Color Purple",
-      year: 1985
+      "title": "The Color Purple",
+      "year": 1985
     }
   ]
 }
 ```
 
-This is because, by default, AMS only includes one level of nesting in the JSON.
+This is because, by default, **AMS only nests associations one level deep**.
+
 This behavior is intended to protect against overly complex JSON that's nested
 many layers deep. Luckily, we can override the behavior by using the [include
-option] in the top-level controller — in this case, the `DirectorsController`:
+option][] in the top-level controller — in this case, the `DirectorsController`:
 
 [include option]: https://github.com/rails-api/active_model_serializers/blob/v0.10.6/docs/general/adapters.md#include-option
 
@@ -326,7 +336,7 @@ class DirectorsController < ApplicationController
     directors = Director.all
     render json: directors, include: ['movies', 'movies.reviews']
   end
-  
+
   def show
     director = Director.find_by(id: params[:id])
     if director
@@ -337,8 +347,6 @@ class DirectorsController < ApplicationController
   end
 
 end
-
-
 ```
 
 Let's take a look at the render statement in our `show` action:
@@ -347,7 +355,7 @@ Let's take a look at the render statement in our `show` action:
 render json: director, include: ['movies', 'movies.reviews']
 ```
 
-This code tells Rails that we want to render information for the `director`, and
+This code tells AMS that we want to render information for the `director`, and
 to also include information for the `movies` associated with that director, and
 for the `reviews` associated with those `movies`.
 
@@ -365,34 +373,34 @@ end
 
 With these changes in place, refresh the page and you should now see this:
 
-```txt
+```json
 {
-  id: 1,
-  name: "Steven Spielberg",
-  birthplace: "Cincinnati, OH",
-  sex: "male",
-  movies: [
+  "id": 1,
+  "name": "Steven Spielberg",
+  "birthplace": "Cincinnati, OH",
+  "female_director": false,
+  "movies": [
     {
-      title: "The Color Purple",
-      year: 1985,
-      reviews: [
+      "title": "The Color Purple",
+      "year": 1985,
+      "reviews": [
         {
-          id: 1,
-          author: "Roger Ebert",
-          date: "December 20, 1985",
-          url: "https://www.rogerebert.com/reviews/the-color-purple-1985"
+          "id": 1,
+          "author": "Roger Ebert",
+          "date": "December 20, 1985",
+          "url": "https://www.rogerebert.com/reviews/the-color-purple-1985"
         },
         {
-          id: 2,
-          author: "Variety Staff",
-          date: "December 31, 1984",
-          url: "https://variety.com/1984/film/reviews/the-color-purple-1200426436/"
+          "id": 2,
+          "author": "Variety Staff",
+          "date": "December 31, 1984",
+          "url": "https://variety.com/1984/film/reviews/the-color-purple-1200426436/"
         },
         {
-          id: 3,
-          author: "Janet Maslin",
-          date: "December 18, 1985",
-          url: "https://www.nytimes.com/1985/12/18/movies/moviesspecial/the-color-purple.html"
+          "id": 3,
+          "author": "Janet Maslin",
+          "date": "December 18, 1985",
+          "url": "https://www.nytimes.com/1985/12/18/movies/moviesspecial/the-color-purple.html"
         }
       ]
     }
@@ -410,15 +418,17 @@ with Rails conventions.
 
 To summarize:
 
-- To customize the JSON returned for a resource, create a serializer for that
-  resource and list the desired attributes
-- The serializer is used automatically by Rails based on naming conventions; to
-  override this, custom serializers can be explicitly passed in the controller
+- To customize the JSON returned for a resource, create a **serializer** for
+  that resource and list the desired attributes.
+- The serializer is used **implicitly** by Rails based on naming conventions; to
+  override this, custom serializers can be **explicitly** passed in the
+  controller.
 - AMS enables the use of the `belongs_to` and `has_many` macros in serializers
-  to render associated data; these macros should be used sparingly
-- By default, only one level of nesting is rendered in the JSON. To override
-  this, the `include` option can be used in the controller
+  to render associated data; these macros should be used sparingly.
+- By default, AMS will only nest associations one level deep in the serialized
+  JSON. To override this, the `include` option can be used in the controller.
 
 ## Resources
 
-[Getting Started with Active Model Serializer](https://github.com/rails-api/active_model_serializers/blob/0-10-stable/docs/general/getting_started.md)
+- [Getting Started with Active Model Serializer](https://github.com/rails-api/active_model_serializers/blob/0-10-stable/docs/general/getting_started.md)
+- [Including Nested Associations](https://github.com/rails-api/active_model_serializers/blob/v0.10.6/docs/general/adapters.md#include-option)
