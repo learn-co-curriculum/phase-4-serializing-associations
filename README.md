@@ -16,9 +16,9 @@ associated models in our Movie app.
 To enable us to do this, we've expanded our movie app to include two more
 models. Specifically, we made the following changes:
 
-1. Instead of including `director` as an attribute of our `Movie` instances,
+- Instead of including `director` as an attribute of our `Movie` instances,
    we created a separate `Director` class.
-2. We modified our app to include movie reviews using a `Review` class.
+- We modified our app to include movie reviews using a `Review` class.
 
 The relationships we want to model look like this:
 
@@ -30,7 +30,7 @@ To implement the `Director` class, we made the following changes to our code:
 
 1. Removed `director` and `female_director` as attributes in our movie migration
    file; added a `director_id` attribute
-2. Added a new migration for our `director` model with four attributes: `name`,
+2. Added a new migration for our `director` model with three attributes: `name`,
    `birthplace` and `sex`
 3. Added the `belongs_to :director` macro to the `Movie` model and the `has_many
    :movies` macro to the `Director` model
@@ -65,7 +65,7 @@ its `index` and `show` routes, as well as the custom `/movies/:id/summary` and
 
 Take a look at the new `index` and `show` routes for `Director` in the browser.
 You'll see that the JSON for the directors includes two attributes that we don't
-want, `created_at` and `updated_at`. Luckily we know how to fix this — we simply
+want: `created_at` and `updated_at`. Luckily we know how to fix this — we simply
 need to create a serializer for `director` as we did for `movies`:
 
 ```rb
@@ -138,8 +138,8 @@ end
 ```
 
 Because we have included the `has_many` macro in the `Director` serializer, when
-we navigate to `localhost:3000/directors/1`, we can see the list of movies that
-belong to that particular director:
+we navigate to `localhost:3000/directors/:id`, we can see the list of movies that
+belong to that particular director, eg:
 
 ```text
 {
@@ -169,13 +169,13 @@ so keeping them to a minumum will save you headaches in the long run.
 Rails automatically uses the appropriate serializer, based on naming
 conventions, to display the associated data for each of our models. We can see
 that in the example above: Rails has used the `MovieSerializer` to render the
-`movie` JSON, so all of the attributes we listed in that serializer are provided
-to the `Director`'s `index` and `show` routes.
+`movie` JSON, so all of the attributes we listed in that serializer are rendered
+in the `Director`'s `index` and `show` routes.
 
 With only one Steven Spielberg movie in our data, including all that information
-isn't too unreasonable. But what happens when we add the rest of Steven
-Spielberg's movies to our database? We may decide we don't need to include
-**all** the details of every movie in this view.
+isn't too unreasonable. But what happens when we add the rest of his movies to
+our database? We may decide we don't need to include **all** the details of
+every movie in this view.
 
 To fix this, we can simply create a new, streamlined serializer:
 
@@ -204,8 +204,8 @@ end
 ```
 
 Rails is still using `DirectorSerializer` to render the JSON, but now
-`DirectorSerializer` serializer is passing the data request along to the new,
-simplified serializer.
+`DirectorSerializer` is passing the data request along to the new, simplified
+serializer.
 
 Now if you refresh the page, you should see the following:
 
@@ -263,15 +263,16 @@ end
 ```
 
 We can now go to `localhost:3000/reviews` and see our reviews listed. However,
-viewing a list of reviews without information about the movies they're
-associated with is not particularly helpful. What we really want to do is render
-the information about a movie's reviews along with the rest of the information
-about that movie. In fact, we don't really need to render information about
-reviews at all *except* as part of the data rendered for a particular movie!
+viewing a list of reviews separately from the information about the movies
+they're associated with is not particularly helpful. What we really want to do
+is render the information about a movie's reviews along with the rest of the
+information about that movie. In fact, we don't really need to render
+information about reviews at all *except* as part of the data rendered for a
+particular movie!
 
-Before we figure out how to get that in place, though, let's follow good
-programming practice and delete the code we no longer need: we'll remove the
-resource for `review`s from the `routes.rb` file and the `index` action from the
+Before we figure out how to get that in place, let's follow good programming
+practice and delete the code we no longer need: we'll remove the resource for
+`review`s from the `routes.rb` file and the `index` action from the
 `ReviewsController`.
 
 Once that's done, to get reviews included in the JSON that's returned for a
@@ -413,9 +414,8 @@ To summarize:
   resource and list the desired attributes
 - The serializer is used automatically by Rails based on naming conventions; to
   override this, custom serializers can be explicitly passed in the controller
-- AMS enables the use of the `belongs_to` and `has_many` macros in the
-  serializer to render associated data; these macros should be used as sparingly
-  as possible
+- AMS enables the use of the `belongs_to` and `has_many` macros in serializers
+  to render associated data; these macros should be used sparingly
 - By default, only one level of nesting is rendered in the JSON. To override
   this, the `include` option can be used in the controller
 
