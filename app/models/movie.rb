@@ -1,4 +1,4 @@
 class Movie < ApplicationRecord
-    belongs_to :director
-    has_many :reviews
+  belongs_to :director
+  has_many :reviews
 end
