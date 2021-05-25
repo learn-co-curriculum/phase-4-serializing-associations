@@ -86,7 +86,7 @@ only displaying the desired attributes.
 
 Next, let's take a look at our new `Movie` index route. Now that we've removed
 the `director` and `female_director` attributes, the JSON for `movies` no longer
-includes any information about director. we need to figure out how to add the
+includes any information about director. We need to figure out how to add the
 information about each movie's associated director to the JSON being returned by
 the  `movies` serializer. AMS allows us to do this using the same macros in the
 serializers that we use to set up associations in our model files. In this case,
