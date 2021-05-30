@@ -338,12 +338,8 @@ class DirectorsController < ApplicationController
   end
 
   def show
-    director = Director.find_by(id: params[:id])
-    if director
-      render json: director, include: ['movies', 'movies.reviews']
-    else
-      render json: { errors: "Director not found" }, status: :not_found
-    end
+    director = Director.find(params[:id])
+    render json: director, include: ['movies', 'movies.reviews']
   end
 
 end
