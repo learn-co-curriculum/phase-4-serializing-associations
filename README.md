@@ -183,13 +183,13 @@ every movie in this view.
 To fix this, we can simply create a new, streamlined serializer:
 
 ```sh
-rails g serializer director_movies
+rails g serializer director_movie
 ```
 
 Here we'll include just the title and year of each of the director's movies:
 
 ```rb
-class DirectorMoviesSerializer < ActiveModel::Serializer
+class DirectorMovieSerializer < ActiveModel::Serializer
   attributes :title, :year
 end
 ```
@@ -205,7 +205,7 @@ new serializer instead; we need to pass it _explicitly_:
 class DirectorSerializer < ActiveModel::Serializer
   attributes :id, :name, :birthplace, :female_director
 
-  has_many :movies, serializer: DirectorMoviesSerializer
+  has_many :movies, serializer: DirectorMovieSerializer
 end
 ```
 
@@ -355,12 +355,12 @@ This code tells AMS that we want to render information for the `director`, and
 to also include information for the `movies` associated with that director, and
 for the `reviews` associated with those `movies`.
 
-Finally, because we're using our custom `DirectorMoviesSerializer` to render the
+Finally, because we're using our custom `DirectorMovieSerializer` to render the
 movies in our `Director` routes, we also need to add the `has_many :reviews`
 macro to that serializer:
 
 ```rb
-class DirectorMoviesSerializer < ActiveModel::Serializer
+class DirectorMovieSerializer < ActiveModel::Serializer
   attributes :title, :year
 
   has_many :reviews
