@@ -53,10 +53,10 @@ everything is set up.
 
 Let's see the updated version of our app in action. To set it up, run:
 
-```sh
-bundle install
-rails db:migrate db:seed
-rails s
+```console
+$ bundle install
+$ rails db:migrate db:seed
+$ rails s
 ```
 
 The setup for `Movie` has not changed: you should still be able to navigate to
@@ -68,8 +68,8 @@ You'll see that the JSON for the directors includes two attributes that we don't
 want: `created_at` and `updated_at`. Luckily we know how to fix this — we simply
 need to create a serializer for `director` as we did for `movies`:
 
-```sh
-rails g serializer director
+```console
+$ rails g serializer director
 ```
 
 We can then add the desired attributes to the `directors_serializer` file:
@@ -182,8 +182,8 @@ every movie in this view.
 
 To fix this, we can simply create a new, streamlined serializer:
 
-```sh
-rails g serializer director_movie
+```console
+$ rails g serializer director_movie
 ```
 
 Here we'll include just the title and year of each of the director's movies:
@@ -257,8 +257,8 @@ end
 
 Next, we'll create our `review` serializer:
 
-```sh
-rails g serializer review
+```console
+$ rails g serializer review
 ```
 
 We can also specify the attributes we want to include:
