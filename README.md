@@ -209,9 +209,9 @@ class DirectorSerializer < ActiveModel::Serializer
 end
 ```
 
-Rails is still using `DirectorSerializer` to render the JSON, but now
-`DirectorSerializer` is passing the data request along to the new, simplified
-serializer.
+Rails is still using `DirectorSerializer` to render the JSON for the director,
+but now `DirectorSerializer` is passing along the request for the director's
+movies to the new, simplified serializer.
 
 Now if you refresh the page, you should see the following:
 
