@@ -177,7 +177,7 @@ that in the example above: Rails has used the `MovieSerializer` to render the
 `movie` JSON, so all of the attributes we listed in that serializer are rendered
 in the `Director`'s `index` and `show` routes.
 
-## Serializing a Many-to-Many Associations
+## Serializing a Many-to-Many Association
 
 Our Movie example uses a one-to-many association (directors have many movies and
 movies belong to a director), but you you can also use Active Model Serializers
