@@ -72,7 +72,7 @@ need to create a serializer for `director` as we did for `movies`:
 $ rails g serializer director
 ```
 
-We can then add the desired attributes to the `directors_serializer` file:
+We can then add the desired attributes to the `director_serializer` file:
 
 ```rb
 # app/serializers/director_serializer.rb
@@ -84,8 +84,10 @@ end
 Now if you navigate to `/directors` or `/directors/:id` you will see that we're
 only displaying the desired attributes.
 
-Next, let's take a look at our new `Movie` index route. Now that we've removed
-the `director` and `female_director` attributes, the JSON for `movies` no longer
+## Serializing a One-to-Many Association
+
+Let's take a look at our new `Movie` index route. Now that we've removed the
+`director` and `female_director` attributes, the JSON for `movies` no longer
 includes any information about director. We need to figure out how to add the
 information about each movie's associated director to the JSON being returned by
 the `movies` serializer. AMS allows us to do this using the same macros in the
@@ -174,6 +176,78 @@ conventions, to display the associated data for each of our models. We can see
 that in the example above: Rails has used the `MovieSerializer` to render the
 `movie` JSON, so all of the attributes we listed in that serializer are rendered
 in the `Director`'s `index` and `show` routes.
+
+## Serializing a Many-to-Many Associations
+
+Our Movie example uses a one-to-many association (directors have many movies and
+movies belong to a director), but you you can also use Active Model Serializers
+with a many-to-many association.
+
+For example, if we had an app with `Article` and `Tag` models, we could create a
+join table and set up `has_many :through` associations for both models:
+
+```rb
+# app/models/article.rb
+class Article < ApplicationRecord
+  has_many :article_tags
+  has_many :tags, through: :article_tags
+end
+
+# app/models/article_tag.rb
+class ArticleTag < ApplicationRecord
+  belongs_to :article
+  belongs_to :tag
+end
+
+# app/models/tag.rb
+class Tag < ApplicationRecord
+  has_many :article_tags
+  has_many :articles, through: :article_tags
+end
+```
+
+Then, if we want the JSON for `Article` to include a list of the article's tags,
+we would simply use `has_many :tags` in our `ArticleSerializer`:
+
+```rb
+# app/serializers/article_serializer.rb
+class ArticleSerializer < ActiveModel::Serializer
+  attributes :id, :title, :author, :content
+
+  has_many :tags
+end
+```
+
+Because the `has_many :through` association is defined in the model files, Rails
+will know to nest a list of each article's tags in the JSON that's being
+returned.
+
+## Adding Custom Serializers
+
+Let's return to our Movie example. We have successfully set up our Director
+serializer to include a list of the director's movies in the JSON that's
+returned:
+
+```json
+{
+  "id": 1,
+  "name": "Steven Spielberg",
+  "birthplace": "Cincinnati, OH",
+  "female_director": false,
+  "movies": [
+    {
+      "id": 1,
+      "title": "The Color Purple",
+      "year": 1985,
+      "length": 154,
+      "description": "Whoopi Goldberg brings Alice Walker's Pulitzer Prize-winning feminist novel to life as Celie, a Southern woman who suffered abuse over decades. A project brought to a hesitant Steven Spielberg by producer Quincy Jones, the film marks Spielberg's first female lead.",
+      "poster_url": "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/3071/3071213_so.jpg",
+      "category": "Drama",
+      "discount": false
+    }
+  ]
+}
+```
 
 With only one Steven Spielberg movie in our data, including all that information
 isn't too unreasonable. But what happens when we add the rest of his movies to
