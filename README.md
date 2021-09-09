@@ -180,11 +180,11 @@ in the `Director`'s `index` and `show` routes.
 ## Serializing a Many-to-Many Associations
 
 Our Movie example uses a one-to-many association (directors have many movies and
-movies belong to a director), but you can use the same setup with a many-to-many
-association.
+movies belong to a director), but you you can also use Active Model Serializers
+with a many-to-many association.
 
 For example, if we had an app with `Article` and `Tag` models, we could create a
-join table and set up `has_many_through` associations for both models:
+join table and set up `has_many :through` associations for both models:
 
 ```rb
 # app/models/article.rb
@@ -218,7 +218,7 @@ class ArticleSerializer < ActiveModel::Serializer
 end
 ```
 
-Because the `has_many_through` association is defined in the model files, Rails
+Because the `has_many :through` association is defined in the model files, Rails
 will know to nest a list of each article's tags in the JSON that's being
 returned.
 
