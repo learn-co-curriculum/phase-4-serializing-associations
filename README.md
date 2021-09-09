@@ -162,6 +162,16 @@ belong to that particular director:
 }
 ```
 
+**Note regarding many-to-many associations**: The example in this lesson uses a
+one-to-many association (directors have many movies and movies belong to a
+director), but you can use the same setup with a many-to-many association. For
+example, if we had an app with `Article` and `Tag` models, we could use a join
+table to set up `has_many_through` associations for both models so articles
+would have many tags and tags would have many articles. Because the
+`has_many_through` association is defined in the model files, if we add
+`has_many :tags` to our `ArticleSerializer`, Rails will know to nest a list of
+each article's tags in the JSON that's being returned.
+
 **IMPORTANT**: You should only add macros to your serializers if you're sure you
 need the data! The level of complexity ramps up quickly as you add more macros,
 so keeping them to a minimum will save you headaches in the long run. It's also
