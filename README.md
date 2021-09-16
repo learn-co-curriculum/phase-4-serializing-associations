@@ -491,12 +491,23 @@ To summarize:
 - To customize the JSON returned for a resource, create a **serializer** for
   that resource and list the desired attributes.
 - The serializer is used **implicitly** by Rails based on naming conventions; to
-  override this, custom serializers can be **explicitly** passed in the
-  controller.
+  override this, custom serializers can be passed **explicitly**.
 - AMS enables the use of the `belongs_to` and `has_many` macros in serializers
   to render associated data; these macros should be used sparingly.
 - By default, AMS will only nest associations one level deep in the serialized
-  JSON. To override this, the `include` option can be used in the controller.
+  JSON. To override this, the `include` option can be used.
+
+## Check For Understanding
+
+Before you move on, make sure you can answer the following questions:
+
+1. If we have `Recipe` and `Ingredient` resources and we want to nest
+   ingredients under recipes in the json we're returning, in which file would we
+   use the `has_many` macro? In which file would we use the `belongs_to` macro?
+2. If we want to specify a custom serializer for the parent resource (`Recipe`),
+   in which file would we do that? In which file would we specify a custom
+   serializer for the child resource (`Ingredient`)?
+3. In which file do we use the `include` keyword to set up deep nesting?
 
 ## Resources
 
